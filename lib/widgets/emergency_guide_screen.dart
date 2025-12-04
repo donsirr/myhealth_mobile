@@ -273,6 +273,31 @@ class EmergencyGuideScreen extends StatelessWidget {
   }
 
   Widget _buildNote(BuildContext context, String note) {
+    // Handle empty notes (spacing)
+    if (note.trim().isEmpty) {
+      return const SizedBox(height: 8);
+    }
+
+    // Check if it's a header (ends with ':')
+    final isHeader = note.endsWith(':');
+
+    if (isHeader) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8, top: 8),
+        child: Text(
+          note,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: accentColor,
+          ),
+        ),
+      );
+    }
+
+    // Remove existing bullet if present
+    final displayText = note.startsWith('• ') ? note.substring(2) : note;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -287,10 +312,11 @@ class EmergencyGuideScreen extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              note,
+              displayText,
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 color: const Color(0xFF64748B),
+                height: 1.5,
               ),
             ),
           ),
