@@ -59,82 +59,84 @@ class IdentifyHubScreen extends StatelessWidget {
           style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700),
         ),
       ),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select Emergency Type',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF0F172A),
-              ),
+        children: [
+          Text(
+            'Select Emergency Type',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF0F172A),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Choose the tool to identify critical symptoms',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                color: const Color(0xFF64748B),
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Choose the tool to identify critical symptoms',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 16,
+              color: const Color(0xFF64748B),
             ),
-            const SizedBox(height: 24),
+          ),
+          const SizedBox(height: 24),
 
-            // Grid of emergency tools (2x2)
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.85,
-              ),
-              itemCount: tools.length,
-              itemBuilder: (context, index) {
-                final tool = tools[index];
-                return _buildToolCard(context, tool);
-              },
-            ),
-
-            const SizedBox(height: 24),
-
-            // Disclaimer
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFEF2F2),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFFECACA),
-                  width: 1,
+          // Grid of emergency tools (2x2)
+          ...tools.asMap().entries.map((entry) {
+            if (entry.key % 2 == 0) {
+              // Create a row for every pair
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  children: [
+                    Expanded(child: _buildToolCard(context, tools[entry.key])),
+                    const SizedBox(width: 16),
+                    if (entry.key + 1 < tools.length)
+                      Expanded(
+                          child: _buildToolCard(context, tools[entry.key + 1]))
+                    else
+                      const Expanded(child: SizedBox()),
+                  ],
                 ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+
+          const SizedBox(height: 8),
+
+          // Disclaimer
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF2F2),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFFECACA),
+                width: 1,
               ),
-              child: Row(
-                children: [
-                  const Icon(
-                    LucideIcons.alertCircle,
-                    color: Color(0xFFEF4444),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'For educational purposes. When in doubt, call emergency services immediately.',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF991B1B),
-                      ),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  LucideIcons.alertCircle,
+                  color: Color(0xFFEF4444),
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    'For educational purposes. When in doubt, call emergency services immediately.',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF991B1B),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -143,7 +145,7 @@ class IdentifyHubScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push(tool.route),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
@@ -160,46 +162,51 @@ class IdentifyHubScreen extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 72,
-              height: 72,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 color: tool.color,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
                 tool.icon,
                 color: Colors.white,
-                size: 40,
+                size: 32,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               tool.title,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF1E293B),
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
             Text(
               tool.subtitle,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: tool.color,
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               tool.description,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: FontWeight.w400,
                 color: const Color(0xFF64748B),
               ),
