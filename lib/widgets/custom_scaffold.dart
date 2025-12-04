@@ -20,8 +20,15 @@ class CustomScaffold extends StatelessWidget {
       backgroundColor: const Color(0xFFF8FAFC),
       body: Stack(
         children: [
-          // Main content
-          child,
+          // Main content with proper bottom padding for dock
+          SafeArea(
+            bottom: false, // Don't use system bottom padding
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(bottom: 100), // Reserve space for dock
+              child: child,
+            ),
+          ),
 
           // Stroke Timer Toast (only show when NOT on stroke page)
           Consumer<StrokeTimerProvider>(

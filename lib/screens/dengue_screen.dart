@@ -62,48 +62,47 @@ class _DengueScreenState extends State<DengueScreen>
           style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700),
         ),
       ),
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(0),
         children: [
           // Map
-          Expanded(
-            flex: 2,
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: const LatLng(13.6218, 123.1948),
-                  initialZoom: 14.0,
-                  minZoom: 13.0,
-                  maxZoom: 18.0,
-                  cameraConstraint: CameraConstraint.contain(
-                    bounds: LatLngBounds(
-                      const LatLng(13.58, 123.15),
-                      const LatLng(13.66, 123.25),
-                    ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: FlutterMap(
+              options: MapOptions(
+                initialCenter: const LatLng(13.6218, 123.1948),
+                initialZoom: 14.0,
+                minZoom: 13.0,
+                maxZoom: 18.0,
+                cameraConstraint: CameraConstraint.contain(
+                  bounds: LatLngBounds(
+                    const LatLng(13.58, 123.15),
+                    const LatLng(13.66, 123.25),
                   ),
                 ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                    subdomains: const ['a', 'b', 'c'],
-                    userAgentPackageName: 'com.myhealth.app',
-                  ),
-                  // Pulsing markers
-                  ...hotspots.map((hotspot) => _buildPulsingMarker(hotspot)),
-                ],
               ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                  subdomains: const ['a', 'b', 'c'],
+                  userAgentPackageName: 'com.myhealth.app',
+                ),
+                // Pulsing markers
+                ...hotspots.map((hotspot) => _buildPulsingMarker(hotspot)),
+              ],
             ),
           ),
 
@@ -122,7 +121,7 @@ class _DengueScreenState extends State<DengueScreen>
 
           const SizedBox(height: 16),
 
-          // Report Case Button - Placed here for visibility
+          // Report Case Button
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
@@ -174,54 +173,143 @@ class _DengueScreenState extends State<DengueScreen>
 
           const SizedBox(height: 24),
 
-          // Prevention Tips (Accordion)
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-              children: [
-                Text(
-                  'Prevention Tips',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF1E293B),
-                  ),
+          // Prevention Tips Button
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ElevatedButton.icon(
+              onPressed: _showPreventionTips,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 56),
+                backgroundColor: const Color(0xFFF97316),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                const SizedBox(height: 12),
-                _buildPreventionTile(
-                  title: 'Eliminate Standing Water',
-                  icon: LucideIcons.droplets,
-                  tips: [
-                    'Empty flower pots and containers weekly',
-                    'Clean roof gutters regularly',
-                    'Cover water storage drums tightly',
-                    'Change pet water bowls daily',
-                  ],
+                elevation: 2,
+              ),
+              icon: const Icon(LucideIcons.shield, size: 24),
+              label: Text(
+                'View Prevention Tips',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
                 ),
-                _buildPreventionTile(
-                  title: 'Protect Your Home',
-                  icon: LucideIcons.home,
-                  tips: [
-                    'Install window screens',
-                    'Use mosquito nets while sleeping',
-                    'Apply insect repellent on exposed skin',
-                    'Wear long sleeves during peak hours (dawn/dusk)',
-                  ],
-                ),
-                _buildPreventionTile(
-                  title: 'Community Action',
-                  icon: LucideIcons.users,
-                  tips: [
-                    'Participate in cleanup drives',
-                    'Report breeding sites to barangay',
-                    'Support fogging operations',
-                    'Educate neighbors about prevention',
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
+
+          const SizedBox(height: 24), // Spacing at bottom
         ],
+      ),
+    );
+  }
+
+  void _showPreventionTips() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCBD5E1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF97316).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        LucideIcons.shield,
+                        color: Color(0xFFF97316),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        'Prevention Tips',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(LucideIcons.x),
+                      style: IconButton.styleFrom(
+                        backgroundColor: const Color(0xFFF1F5F9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Content
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  children: [
+                    _buildPreventionTile(
+                      title: 'Eliminate Standing Water',
+                      icon: LucideIcons.droplets,
+                      tips: [
+                        'Empty flower pots and containers weekly',
+                        'Clean roof gutters regularly',
+                        'Cover water storage drums tightly',
+                        'Change pet water bowls daily',
+                      ],
+                    ),
+                    _buildPreventionTile(
+                      title: 'Protect Your Home',
+                      icon: LucideIcons.home,
+                      tips: [
+                        'Install window screens',
+                        'Use mosquito nets while sleeping',
+                        'Apply insect repellent on exposed skin',
+                        'Wear long sleeves during peak hours (dawn/dusk)',
+                      ],
+                    ),
+                    _buildPreventionTile(
+                      title: 'Community Action',
+                      icon: LucideIcons.users,
+                      tips: [
+                        'Participate in cleanup drives',
+                        'Report breeding sites to barangay',
+                        'Support fogging operations',
+                        'Educate neighbors about prevention',
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

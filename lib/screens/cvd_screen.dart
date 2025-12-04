@@ -278,8 +278,6 @@ class _CvdScreenState extends State<CvdScreen> {
   }
 
   Widget _buildQuestionnaire() {
-    final questions = questionBank[selectedDisease]!;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -297,18 +295,39 @@ class _CvdScreenState extends State<CvdScreen> {
           style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: ListView.builder(
+          // Scrollable questions
+          Padding(
+            padding:
+                const EdgeInsets.only(top: 80), // Space for floating button
+            child: ListView(
               padding: const EdgeInsets.all(24),
-              itemCount: questions.length,
-              itemBuilder: (context, index) {
-                return _buildQuestionCard(questions[index]);
-              },
+              children: questionBank[selectedDisease]!.map((question) {
+                return _buildQuestionCard(question);
+              }).toList(),
             ),
           ),
-          _buildCalculateButton(),
+          // Floating button at TOP
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: _buildCalculateButton(),
+            ),
+          ),
         ],
       ),
     );
@@ -413,33 +432,21 @@ class _CvdScreenState extends State<CvdScreen> {
       (q) => answers.containsKey(q.id),
     );
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
-          ),
-        ],
+    return ElevatedButton(
+      onPressed: allAnswered ? _calculateRisk : null,
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 56),
+        backgroundColor: const Color(0xFF0EA5E9),
+        disabledBackgroundColor: const Color(0xFFCBD5E1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
-      child: SafeArea(
-        child: ElevatedButton(
-          onPressed: allAnswered ? _calculateRisk : null,
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 56),
-            backgroundColor: const Color(0xFF0EA5E9),
-            disabledBackgroundColor: const Color(0xFFCBD5E1),
-          ),
-          child: Text(
-            'Analyze Risk',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+      child: Text(
+        'Analyze Risk',
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

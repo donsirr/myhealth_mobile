@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import '../widgets/emergency_guide_screen.dart';
 
 class ChildEmergencyScreen extends StatelessWidget {
@@ -9,10 +8,7 @@ class ChildEmergencyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmergencyGuideScreen(
       title: 'Child Emergency',
-      subtitle: 'Pediatric Warning Signs',
-      color: const Color(0xFF14B8A6),
-      icon: LucideIcons.baby,
-      emergencySigns: const [
+      warningSignsData: const [
         'High fever in infants < 3 months (≥38°C) - ER immediately',
         'Difficulty breathing or rapid breathing',
         'Blue or pale skin, lips, or fingernails',
@@ -23,7 +19,7 @@ class ChildEmergencyScreen extends StatelessWidget {
         'Stiff neck with fever',
         'Head injury with loss of consciousness',
       ],
-      notes: const [
+      additionalNotes: const [
         'FEVER GUIDE:',
         '• 0-3 months: Any fever ≥38°C → ER immediately',
         '• 3-6 months: Fever ≥38.3°C → Call doctor',
@@ -31,7 +27,8 @@ class ChildEmergencyScreen extends StatelessWidget {
         '',
         'Trust your parental instinct - if something feels wrong, seek help',
       ],
-      emergencyNumber: '911',
+      accentColor: const Color(0xFF14B8A6),
+      phoneNumber: '911',
     );
   }
 }

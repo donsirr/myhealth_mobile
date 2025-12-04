@@ -5,22 +5,18 @@ import 'package:url_launcher/url_launcher.dart';
 
 class EmergencyGuideScreen extends StatelessWidget {
   final String title;
-  final String subtitle;
-  final Color color;
-  final IconData icon;
-  final List<String> emergencySigns;
-  final List<String>? notes;
-  final String? emergencyNumber;
+  final List<String> warningSignsData;
+  final List<String> additionalNotes;
+  final Color accentColor;
+  final String phoneNumber;
 
   const EmergencyGuideScreen({
     super.key,
     required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.icon,
-    required this.emergencySigns,
-    this.notes,
-    this.emergencyNumber = '911',
+    required this.warningSignsData,
+    required this.additionalNotes,
+    required this.accentColor,
+    this.phoneNumber = '(054) 473-2326',
   });
 
   @override
@@ -30,203 +26,198 @@ class EmergencyGuideScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           title,
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700),
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Hero Header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [color, color.withValues(alpha: 0.8)],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Icon(icon, color: Colors.white, size: 64),
-                  const SizedBox(height: 16),
-                  Text(
-                    title,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            // Warning Signs
-            Text(
-              'Warning Signs',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF1E293B),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            ...emergencySigns.asMap().entries.map((entry) {
-              return _buildSignCard(entry.key + 1, entry.value);
-            }),
-
-            // Notes Section
-            if (notes != null && notes!.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: color.withValues(alpha: 0.3),
-                    width: 2,
+      body: Stack(
+        children: [
+          // Scrollable content with top padding for button
+          Padding(
+            padding: const EdgeInsets.only(top: 80), // Space for call button
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              children: [
+                // Header
+                Text(
+                  'Warning Signs',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF1E293B),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                const SizedBox(height: 16),
+
+                // Warning signs
+                ...warningSignsData.asMap().entries.map((entry) {
+                  return _buildWarningSign(
+                    context,
+                    number: entry.key + 1,
+                    sign: entry.value,
+                  );
+                }),
+
+                const SizedBox(height: 32),
+
+                // Important Notes with better design
+                if (additionalNotes.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: accentColor.withValues(alpha: 0.3),
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(LucideIcons.info, color: color, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Important Notes',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: color,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    ...notes!.where((note) => note.isNotEmpty).map((note) {
-                      // Check if it's a header (ends with ':' or doesn't start with '•')
-                      final isHeader = note.endsWith(':') ||
-                          (!note.startsWith('•') && !note.contains('→'));
-                      final displayText =
-                          note.startsWith('• ') ? note.substring(2) : note;
-
-                      if (isHeader) {
-                        return Padding(
-                          padding: EdgeInsets.only(
-                              bottom: 8,
-                              top: notes!.indexOf(note) == 0 ? 0 : 8),
-                          child: Text(
-                            note,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF1E293B),
-                            ),
-                          ),
-                        );
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
                           children: [
-                            Text(
-                              '• ',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 14,
-                                color: const Color(0xFF475569),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                LucideIcons.info,
+                                color: Colors.white,
+                                size: 20,
                               ),
                             ),
-                            Expanded(
-                              child: Text(
-                                displayText,
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 14,
-                                  color: const Color(0xFF475569),
-                                  height: 1.5,
-                                ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Important Notes',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF1E293B),
                               ),
                             ),
                           ],
                         ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 24),
-
-            // Disclaimer
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFEF2F2),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFFECACA)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    LucideIcons.alertCircle,
-                    color: Color(0xFFEF4444),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'This is for educational purposes only. When in doubt, always call emergency services.',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF991B1B),
-                      ),
+                        const SizedBox(height: 16),
+                        ...additionalNotes
+                            .map((note) => _buildNote(context, note)),
+                      ],
                     ),
                   ),
                 ],
+              ],
+            ),
+          ),
+
+          // Enhanced call button at TOP
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [accentColor, accentColor.withValues(alpha: 0.85)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: accentColor.withValues(alpha: 0.4),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: Container(
+                  height: 58,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _launchPhone,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                LucideIcons.phone,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'EMERGENCY CALL',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      color: accentColor.withValues(alpha: 0.7),
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                                  Text(
+                                    phoneNumber,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                      color: accentColor,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              LucideIcons.chevronRight,
+                              color: accentColor,
+                              size: 24,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      floatingActionButton: SafeArea(
-        child: _buildEmergencyButton(context),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  Widget _buildSignCard(int number, String sign) {
+  Widget _buildWarningSign(BuildContext context,
+      {required int number, required String sign}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(20),
@@ -234,7 +225,7 @@ class EmergencyGuideScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withValues(alpha: 0.2),
+          color: accentColor.withValues(alpha: 0.2),
           width: 2,
         ),
         boxShadow: [
@@ -251,7 +242,7 @@ class EmergencyGuideScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color,
+              color: accentColor,
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -281,36 +272,35 @@ class EmergencyGuideScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmergencyButton(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 48,
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      child: ElevatedButton.icon(
-        onPressed: () => _launchPhone(emergencyNumber!),
-        icon: const Icon(LucideIcons.phone, size: 24),
-        label: Text(
-          'Call $emergencyNumber NOW',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
+  Widget _buildNote(BuildContext context, String note) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '• ',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              color: const Color(0xFF64748B),
+            ),
           ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFEF4444),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+          Expanded(
+            child: Text(
+              note,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: const Color(0xFF64748B),
+              ),
+            ),
           ),
-          elevation: 8,
-          shadowColor: const Color(0xFFEF4444).withValues(alpha: 0.5),
-        ),
+        ],
       ),
     );
   }
 
-  Future<void> _launchPhone(String number) async {
-    final uri = Uri.parse('tel:$number');
+  Future<void> _launchPhone() async {
+    final uri = Uri.parse('tel:$phoneNumber');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
