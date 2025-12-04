@@ -405,6 +405,6 @@ This project is licensed under the **MIT License** - empowering healthcare innov
 
 *Your health, connected. Your life, protected.*
 
-[Report Bug](https://github.com/yourusername/myhealth/issues) · [Request Feature](https://github.com/yourusername/myhealth/issues) · [Documentation](#)
+[Report Bug](https://github.com/donsirr/myhealth/issues) · [Request Feature](https://github.com/donsirr/myhealth/issues) · [Documentation](#)
 
 </div>

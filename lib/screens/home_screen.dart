@@ -96,47 +96,71 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      children: [
-                        _buildServiceCard(
-                          context,
+
+                    // Services Grid - Manual 2x2 layout
+                    ...[
+                      _ServicePair(
+                        service1: _ServiceData(
                           icon: LucideIcons.activity,
                           title: 'Heart Health',
                           subtitle: 'Risk Assessment',
                           color: const Color(0xFF0EA5E9),
                           route: '/cvd',
                         ),
-                        _buildServiceCard(
-                          context,
+                        service2: _ServiceData(
                           icon: LucideIcons.map,
                           title: 'Dengue Watch',
                           subtitle: 'Live Outbreak Map',
                           color: const Color(0xFFF97316),
                           route: '/dengue',
                         ),
-                        _buildServiceCard(
-                          context,
+                      ),
+                      _ServicePair(
+                        service1: _ServiceData(
                           icon: LucideIcons.calendar,
                           title: 'Wellness',
                           subtitle: 'Free Screenings',
                           color: const Color(0xFF22C55E),
                           route: '/screening',
                         ),
-                        _buildServiceCard(
-                          context,
+                        service2: _ServiceData(
                           icon: LucideIcons.siren,
                           title: 'Identify',
                           subtitle: 'Emergency Tools',
                           color: const Color(0xFFEF4444),
                           route: '/identify',
                         ),
-                      ],
-                    ),
+                      ),
+                    ].map((pair) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _buildServiceCard(
+                                context,
+                                icon: pair.service1.icon,
+                                title: pair.service1.title,
+                                subtitle: pair.service1.subtitle,
+                                color: pair.service1.color,
+                                route: pair.service1.route,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildServiceCard(
+                                context,
+                                icon: pair.service2.icon,
+                                title: pair.service2.title,
+                                subtitle: pair.service2.subtitle,
+                                color: pair.service2.color,
+                                route: pair.service2.route,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -225,7 +249,7 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.go(route),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(24),
@@ -242,36 +266,41 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 64,
-              height: 64,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: color, size: 32),
+              child: Icon(icon, color: color, size: 28),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               title,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF1E293B),
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
             Text(
               subtitle,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w400,
                 color: const Color(0xFF64748B),
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -285,4 +314,28 @@ class HomeScreen extends StatelessWidget {
       await launchUrl(uri);
     }
   }
+}
+
+// Helper class for service pairs
+class _ServicePair {
+  final _ServiceData service1;
+  final _ServiceData service2;
+
+  _ServicePair({required this.service1, required this.service2});
+}
+
+class _ServiceData {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final String route;
+
+  _ServiceData({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.route,
+  });
 }
