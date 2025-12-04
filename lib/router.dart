@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/custom_scaffold.dart';
 import 'screens/home_screen.dart';
@@ -16,10 +17,36 @@ final router = GoRouter(
   initialLocation: '/',
   routes: [
     ShellRoute(
-      builder: (context, state, child) {
-        return CustomScaffold(
-          currentRoute: state.uri.path,
-          child: child,
+      pageBuilder: (context, state, child) {
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: CustomScaffold(
+            currentRoute: state.uri.path,
+            child: child,
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, widget) {
+            // Smooth scale + fade transition
+            const begin = 0.94;
+            const end = 1.0;
+            const curve = Curves.easeInOutCubicEmphasized;
+
+            final scaleTween = Tween(begin: begin, end: end).chain(
+              CurveTween(curve: curve),
+            );
+            final fadeTween = Tween(begin: 0.0, end: 1.0).chain(
+              CurveTween(curve: curve),
+            );
+
+            return FadeTransition(
+              opacity: animation.drive(fadeTween),
+              child: ScaleTransition(
+                scale: animation.drive(scaleTween),
+                child: widget,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+          reverseTransitionDuration: const Duration(milliseconds: 250),
         );
       },
       routes: [
